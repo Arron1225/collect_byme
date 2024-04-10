@@ -49,32 +49,45 @@ urls_tmp=[]
 browser = webdriver.Chrome()
 browser.get('https://tw.news.yahoo.com/search?p=股票&fr=uh3_news_web&fr2=p%3Anews%2Cm%3Asb&.tsrc=uh3_news_web')
 item=[]
+time.sleep(5)
+h = browser.execute_script("return document.body.scrollHeight")
+print(h)
+browser.execute_script("window.scrollTo(0,document.body.scrollHeight")
+# scroll_pause_time = 2  # Pause between each scroll
+# screen_height = browser.execute_script("return window.screen.height;")  # Browser window height
+# # i = 1
+# # while True:
+# #     # Scroll down
+# #     browser.execute_script(f"window.scrollTo(0, {screen_height * i});")
+# #     i += 1
+# #     time.sleep(scroll_pause_time)
 
-scroll_pause_time = 2  # Pause between each scroll
-screen_height = browser.execute_script("return window.screen.height;")  # Browser window height
-i = 1
-while True:
-    # Scroll down
-    browser.execute_script(f"window.scrollTo(0, {screen_height * i});")
-    i += 1
-    time.sleep(scroll_pause_time)
+# #     # Check if reaching the end of the page
+# #     scroll_height = browser.execute_script("return document.body.scrollHeight;")
+# #     if screen_height * i > scroll_height:
+# #         break
+# # i = 1
 
-    # Check if reaching the end of the page
-    scroll_height = browser.execute_script("return document.body.scrollHeight;")
-    if screen_height * i > scroll_height:
-        break
+# while True:
+#     # scroll one screen height each time
+#     browser.execute_script("window.scrollTo(0, {screen_height}*{i});".format(screen_height=screen_height, i=i))  
+#     i += 1
+#     time.sleep(scroll_pause_time)
+#     # update scroll height each time after scrolled, as the scroll height can change after we scrolled the page
+#     scroll_height = browser.execute_script("return document.body.scrollHeight;")  
+#     # Break the loop when the height we need to scroll to is larger than the total scroll height
+#     if (screen_height) * i > scroll_height:
+#         break
 
-soup = BeautifulSoup(browser.page_source, "html.parser")
-# Process and save the data as needed
-head = soup.find_all("a",class_="Fw(b) Fz(20px) Lh(23px) Fz(17px)--sm1024 Lh(19px)--sm1024 mega-item-header-link Td(n) C(#0078ff):h C(#000) LineClamp(2,46px) LineClamp(2,38px)--sm1024 not-isInStreamVideoEnabled")
-# print(head)
-for h in head:
-    head_tmp.append(h.text.strip())
-    urls_tmp.append(h.get('href'))
-print(head_tmp) 
-print(urls_tmp)
-# Close the WebDriver session
-browser.quit()
+
+# soup = BeautifulSoup(browser.page_source, "html.parser")
+# head = soup.find_all("a",class_="Fw(b) Fz(20px) Lh(23px) Fz(17px)--sm1024 Lh(19px)--sm1024 mega-item-header-link Td(n) C(#0078ff):h C(#000) LineClamp(2,46px) LineClamp(2,38px)--sm1024 not-isInStreamVideoEnabled")
+# for h in head:
+#     head_tmp.append(h.text.strip())
+#     urls_tmp.append(h.get('href'))
+# print(head_tmp) 
+# print(urls_tmp)
+# browser.quit()
 
 
 
