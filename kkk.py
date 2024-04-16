@@ -22,7 +22,6 @@ for i in range(len(tmp)):
     tmp[i]=a1
 print(tmp)
 
-print("Original Dataframe") 
   
 first_column = df.pop('Name') 
 df.insert(0, 'Name', first_column) 
