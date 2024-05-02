@@ -75,13 +75,13 @@ import os
 # print(df['Code'][0])
 # string = "_0050_元大台灣50"
 
-df = pd.read_csv('table.csv')
-df['Name'] =df['Name'].str.split("_") 
-for i in range(len(df)):
-    print(df['Name'][i][1])
-# print(df['Name'][1][1])
-# print(type(t))
-import os
+# df = pd.read_csv('table.csv')
+# df['Name'] =df['Name'].str.split("_") 
+# for i in range(len(df)):
+#     print(df['Name'][i][1])
+# # print(df['Name'][1][1])
+# # print(type(t))
+# import os
 
 # 指定目錄的路徑
 # directory = './all_data'
@@ -103,4 +103,37 @@ import os
 #         print(f"已將檔案名稱由 {filename} 更改為 {new_filename}")
 
 
-# print("所有檔案名稱更新完成！")
+
+# from datetime import datetime
+# import pytz
+
+# # 獲取當前的日期時間（不包含時區資訊）
+# current_datetime = datetime.now().date
+
+# # 設定目標時區為台北時區（UTC+8:00）
+# target_timezone = pytz.timezone('Asia/Taipei')
+
+# # 將當前日期時間設定為指定時區
+# target_datetime_with_timezone = target_timezone.localize(current_datetime)
+
+# # 輸出結果
+# print("自動偵測的目標日期時間（包含時區資訊）：", target_datetime_with_timezone)
+from datetime import datetime, time
+import pytz
+
+# 設定目標日期和時間（不包含時區資訊）
+target_date = datetime.now().date()  # 目標日期為 2024-05-02
+target_time = time(0, 0, 0)  # 目標時間為 00:00:00
+
+# 設定目標時區為台北時區（UTC+8:00）
+target_timezone = pytz.timezone('Asia/Taipei')
+
+# 組合日期和時間，得到完整的目標日期時間
+target_datetime = datetime.combine(target_date, target_time)
+
+# 將目標日期時間設定為指定時區
+target_datetime_with_timezone = target_timezone.localize(target_datetime)
+
+# 輸出結果
+
+print("目標日期時間（包含時區資訊）：", target_datetime_with_timezone)
