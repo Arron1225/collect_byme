@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+   <link rel="stylesheet" href="../static/css/template.css">
+   <meta charset="UTF-8">
+   <body>
+      <h2> Welcome,{{name}}</h2>
+      <h2><a href="{{url_for('logout')}}">登出</a></h2>
+      <div class="form-container">
+         <form method = "post"  action="/search">  
+            <p>
+            公司名稱/代號：<input type="search"name="company"required/>
+            </p>
+             <p>
+               起始日期：<input type="date" name="start_date" required/>
+             </p>
+             <p>
+               截止日期：<input type="date" name="end_date" required/>
+             </p>
+             <p>
+              <label for="file_type">選擇下載檔案類型:</label>
+              <select id="file_type" name="file_type">
+                <option value="csv">csv</option>
+                <option value="excel">excel</option>
+              </select>
+             </p>     
+             
+             <p>
+                {% with input_error = get_flashed_messages() %}
+                {% if input_error %}
+                <p class="error">
+                    {% for i in input_error %}
+                        {{ i }}
+                    {% endfor %}
+                </p>
+                {% endif %}
+                {% endwith %}
+               <button type="submit">查詢</button>
+               <h2><a href="{{url_for('download')}}"> {{file_name}}</a></h2>
+               
+             </p>
+            
+           </form>
+     </div>
+     <div>
+      <table>
+        {% for table in tables %}
+        {{titles[loop.index]}}
+        {{ table|safe }}
+        {% endfor %}
+     </table>
+    
+      
+     </div>
+   </body>
+</html>

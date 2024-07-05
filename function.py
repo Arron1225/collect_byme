@@ -15,13 +15,13 @@ import pymssql
 import struct
 import os
 import pytz
-# from google.oauth2 import service_account
-# from googleapiclient.discovery import build
-# from googleapiclient.http import MediaFileUpload
-# from google.auth.transport.requests import Request
-# from google.oauth2.credentials import Credentials
-# from google_auth_oauthlib.flow import InstalledAppFlow
-# from googleapiclient.errors import HttpError
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.errors import HttpError
 from requests.exceptions import ConnectionError, Timeout, RequestException
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -35,12 +35,27 @@ from sqlalchemy.engine import URL
 from generateApiKey import generateApiKey
 from datetime import datetime, timedelta,date
 
+
+
+
+
+
+
 def out_words():
     res = ''.join(random.choices(string.ascii_uppercase +string.digits, k=16))
     # seed='16'
     # api_key = generateApiKey(res,seed)
     return res 
-
+# 產生hash
+def hash_text(password):
+    salt = 'pwcprj'
+    password_hash = hashlib.sha256((password + salt).encode('utf-8')).hexdigest()
+    return password_hash
+# 驗證hash
+def verify_text(stored_password, input_password):
+    salt = 'pwcprj'
+    password_hash = hashlib.sha256((input_password + salt).encode('utf-8')).hexdigest()
+    return password_hash == stored_password    
 # 轉換時間(西元---->民國)
 def conver(input:str)-> str:
     a = input
@@ -50,6 +65,33 @@ def conver(input:str)-> str:
     afy = str(afy)
     out = '/'.join([afy,b[1],b[2]])
     return out
+# 設定重新連線
+def fetch_data_with_retries(url, max_retries=8):
+    headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36'
+    }
+    retries = 0
+    while retries < max_retries:
+        try:
+            response = requests.get(url, headers=headers, timeout=20)
+            response.raise_for_status()
+            return response.text
+        except (ConnectionError, Timeout) as e:
+            retries += 1
+            error_msg = f"連線錯誤: {e}. 重試 {retries}/{max_retries}..."
+            with open('log/tpex__connect_error.txt', 'a', encoding='utf-8') as f:
+                f.write(error_msg + '\n')
+            print(error_msg)
+            time.sleep(2 ** retries)  # 指數回退
+        except RequestException as e:
+            error_msg = f"請求失敗: {e}"
+            with open('log/tpex__connect_error.txt', 'a', encoding='utf-8') as f:
+                f.write(error_msg + '\n')
+            print(error_msg)
+            break
+    return None
+
+
 
 # 先建一個連線函式
 def get_conn():
@@ -113,10 +155,35 @@ def connect_setting_mysql():
     password = ''
     host = 'localhost'
     database_name = 'pwc'
-    port = '3307'
+    port = '3306'
     connection_string = f'{database_type}+{connector}://{user}:{password}@{host}:{port}/{database_name}'
     engine = create_engine(connection_string)
     return engine
+
+def get_mysql_conn():
+    # 替换为你的MySQL连接信息
+    return pymysql.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='pwc',
+        charset='utf8mb4',
+        cursorclass=pymysql.cursors.DictCursor
+    )
+
+#將一般的時間例如:173050轉換成17:30:50
+def format_time(t):
+    try:
+        return pd.to_datetime(t, format='%H%M%S').strftime('%H:%M:%S')
+    except ValueError:
+        return '000000'
+
+#將一般的日期例如:20001225轉換成2000-12-25
+def format_date(t):
+    try:
+        return pd.to_datetime(t, format='%Y%m%d').strftime('%Y-%m-%d')
+    except ValueError:
+        return '00000000'
 
 # 資料處理 decimal
 def change_decimal_to_num(input_list):
